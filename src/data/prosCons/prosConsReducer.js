@@ -1,9 +1,6 @@
 import {
-    // UPDATE_PROS_CONS_DATA_SUCCESS,
     GET_PROS_CONS_DATA_SUCCESS,
-    GET_PROS_CONS_DATA_FAILURE,
-    ADD_PROS,
-    ADD_CONS, REMOVE_CONS, REMOVE_PROS
+    GET_PROS_CONS_DATA_FAILURE
 } from "../actions";
 
 const initialState = {
@@ -14,10 +11,11 @@ const initialState = {
 export function prosCons(state = initialState, action) {
     switch (action.type) {
         case GET_PROS_CONS_DATA_SUCCESS:
+            const {prosCons: {pros, cons}} = action;
             return {
                 ...state,
-                pros: action.payload.pros,
-                cons: action.payload.cons
+                pros: pros ? pros : [],
+                cons: cons ? cons : []
             };
 
         case GET_PROS_CONS_DATA_FAILURE:
@@ -25,36 +23,6 @@ export function prosCons(state = initialState, action) {
                 ...state,
                 pros: [],
                 cons: []
-            };
-
-        case ADD_PROS:
-            return {
-                ...state,
-                pros: [...state.pros, action.pros],
-            };
-
-        case ADD_CONS:
-            return {
-                ...state,
-                cons: [...state.cons, action.cons],
-            };
-
-        case REMOVE_PROS:
-            const newPros = [...state.pros];
-            newPros.splice(action.index, 1);
-
-            return {
-                ...state,
-                pros: newPros
-            };
-
-        case REMOVE_CONS:
-            const newCons = [...state.cons];
-            newCons.splice(action.index, 1);
-
-            return {
-                ...state,
-                cons: newCons
             };
 
         default:

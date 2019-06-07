@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {css} from 'emotion';
-import {buttonDefaultStylesClass, pullRightClass, roundingIntervalsClass} from '../shared/StyleHelper';
+import {buttonDefaultStylesClass, roundingIntervalsClass} from '../shared/StyleHelper';
 import {colors} from '../shared/colors';
 
 const footerClass = css`
@@ -9,28 +9,37 @@ const footerClass = css`
     display: flex;
 `;
 
+const footerLeftClass = css`
+    flex: 1;
+    margin-right: 8px;
+`;
+
 const inputClass = css`
     border: 1px solid ${colors.mainColor};
+    box-sizing: border-box;
     padding: 4px;
+    width: 100%;
 `;
 
 export const FooterComponent = (props) => {
     const [inputValue, setInputValue] = React.useState('');
 
     const handleClick = () => {
-        if(inputValue) {
-            props.updateProsCons(inputValue);
+        const trimmedValue = inputValue.trim();
+
+        if (trimmedValue) {
+            props.addProsCons(trimmedValue, props.type);
             setInputValue('');
         }
     };
 
-    const handleChange = (e) => {
-        setInputValue(e.target.value);
+    const handleChange = ({target}) => {
+        setInputValue(target.value);
     };
 
     return (
         <footer className={footerClass}>
-            <div>
+            <div className={footerLeftClass}>
                 <input
                     type="text"
                     value={inputValue}
@@ -40,18 +49,16 @@ export const FooterComponent = (props) => {
                 />
             </div>
 
-            <div className={pullRightClass}>
-                <button
-                    className={buttonDefaultStylesClass}
-                    onClick={handleClick}>
-                    +
-                </button>
-            </div>
+            <button
+                className={buttonDefaultStylesClass}
+                onClick={handleClick}>
+                +
+            </button>
         </footer>
     )
 };
 
 FooterComponent.propTypes = {
-    updateProsCons: PropTypes.func,
+    addProsCons: PropTypes.func,
     placeholder: PropTypes.string
 };

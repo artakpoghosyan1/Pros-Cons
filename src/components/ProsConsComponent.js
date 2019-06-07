@@ -4,11 +4,17 @@ import PropTypes from 'prop-types';
 import {css} from 'emotion';
 import {colors} from '../shared/colors';
 import {getUserData} from '../data/user/userActionCreators';
-import {getProsConsData, addCons, addPros, removeCons, removePros} from '../data/prosCons/prosConsActionCreators';
+import {
+    getProsConsData,
+    updateProsConsData
+} from '../data/prosCons/prosConsActionCreators';
 import {ListComponent} from './ListComponent';
 import {FooterComponent} from './FooterComponent';
 import {roundingIntervalsClass} from "../shared/StyleHelper";
 import {HeaderComponent} from "./HeaderComponent";
+import {prosConsSelector} from "../data/prosCons/selectors/prosConsSelector";
+import {userDataSelector} from "../data/user/selectors/userDataSelector";
+import {addProsCons, removeProsCons, updateProsConsItem} from "../data/dataUtility";
 
 const ProsConsWrapperClass = css`
     margin: 0 auto;
@@ -23,6 +29,7 @@ const tableClass = css`
     border: 1px solid ${colors.mainColor};
     display: flex;
     height: calc(100vh - 100px);
+    min-height: 200px;
 `;
 
 const columnsClass = css`
@@ -45,34 +52,40 @@ class ProsCons extends React.Component {
     constructor(props) {
         super(props);
 
-        this.addPros = this.addPros.bind(this);
-        this.addCons = this.addCons.bind(this);
-        this.removePros = this.removePros.bind(this);
-        this.removeCons = this.removeCons.bind(this);
+        this.addProsCons = this.addProsCons.bind(this);
+        this.removeProsCons = this.removeProsCons.bind(this);
+        this.updateProsCons = this.updateProsCons.bind(this);
     }
 
     componentDidMount() {
-        const {getUserData, getProsConsData, userData: {groupId, userId}} = this.props;
+        const {getUserData, getProsConsData} = this.props;
 
-        getUserData().then(() => {
-            getProsConsData(groupId, userId)
+        getUserData().then((response) => {
+            const [{groupId}, {userId}] = response.userData;
+
+            getProsConsData(groupId, userId);
         });
     }
 
-    addPros(pros) {
-        this.props.addPros(pros)
+    addProsCons(item, type) {
+        const {prosCons, userData, updateProsConsData} = this.props;
+        const newProsCons = addProsCons(prosCons, type, item);
+
+        updateProsConsData(userData, newProsCons);
     }
 
-    addCons(cons) {
-        this.props.addCons(cons)
+    removeProsCons(index, type) {
+        const {prosCons, userData, updateProsConsData} = this.props;
+        const newProsCons = removeProsCons(prosCons, type, index);
+
+        updateProsConsData(userData, newProsCons);
     }
 
-    removePros(index) {
-        this.props.removePros(index)
-    }
+    updateProsCons(index, type, newValue) {
+        const {prosCons, userData, updateProsConsData} = this.props;
+        const newProsCons = updateProsConsItem(prosCons, type, index, newValue);
 
-    removeCons(index) {
-        this.props.removeCons(index)
+        updateProsConsData(userData, newProsCons);
     }
 
     render() {
@@ -87,13 +100,16 @@ class ProsCons extends React.Component {
                         <div className={bodyClass}>
                             <ListComponent
                                 list={this.props.prosCons.pros}
-                                updateProsCons={this.removePros}
+                                removeProsCons={this.removeProsCons}
+                                updateProsCons={this.updateProsCons}
+                                type="pros"
                             />
                         </div>
 
                         <FooterComponent
-                            updateProsCons={this.addPros}
+                            addProsCons={this.addProsCons}
                             placeholder="New Pro's"
+                            type="pros"
                         />
                     </section>
 
@@ -103,13 +119,16 @@ class ProsCons extends React.Component {
                         <div className={bodyClass}>
                             <ListComponent
                                 list={this.props.prosCons.cons}
-                                updateProsCons={this.removeCons}
+                                removeProsCons={this.removeProsCons}
+                                updateProsCons={this.updateProsCons}
+                                type="cons"
                             />
                         </div>
 
                         <FooterComponent
-                            updateProsCons={this.addCons}
+                            addProsCons={this.addProsCons}
                             placeholder="New Con's"
+                            type="cons"
                         />
                     </section>
                 </div>
@@ -123,24 +142,18 @@ ProsCons.propTypes = {
     prosCons: PropTypes.object,
     getUserData: PropTypes.func,
     getProsConsData: PropTypes.func,
-    addPros: PropTypes.func,
-    addCons: PropTypes.func,
-    removePros: PropTypes.func,
-    removeCons: PropTypes.func
+    updateProsConsData: PropTypes.func
 };
 
 const mapStateToProps = state => ({
-    userData: state.user,
-    prosCons: state.prosCons
+    userData: userDataSelector(state),
+    prosCons: prosConsSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({
     getUserData: () => dispatch(getUserData()),
     getProsConsData: (groupId, userId) => dispatch(getProsConsData(groupId, userId)),
-    addPros: (pros) => dispatch(addPros(pros)),
-    addCons: (cons) => dispatch(addCons(cons)),
-    removePros: (index) => dispatch(removePros(index)),
-    removeCons: (index) => dispatch(removeCons(index)),
+    updateProsConsData: (userData, prosCons) => dispatch(updateProsConsData(userData, prosCons))
 });
 
 export const ProsConsComponent = connect(

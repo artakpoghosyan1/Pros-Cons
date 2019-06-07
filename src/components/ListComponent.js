@@ -3,6 +3,8 @@ import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {css} from "emotion";
 import {buttonDefaultStylesClass, pullRightClass} from "../shared/StyleHelper";
+import {prosConsSelector} from "../data/prosCons/selectors/prosConsSelector";
+import {ListItemFieldComponent} from "./ListItemFieldComponent";
 
 const listClass = css`
     list-style: none;
@@ -18,20 +20,24 @@ const listItemClass = css`
 `;
 
 const List = (props) => {
-    const handleClick = (index) => {
-        props.updateProsCons(index)
+    const updateProsConsOnBlur = (index, newValue) => {
+        props.updateProsCons(index, props.type, newValue);
     };
 
     return (
         <ul className={listClass}>
             {props.list.map((listItem, index) => (
                 <li className={listItemClass} key={index}>
-                    <div>{listItem}</div>
+                    <ListItemFieldComponent
+                        value={listItem}
+                        updateProsCons={(newValue) => updateProsConsOnBlur(index, newValue)}
+                        type={props.type}
+                    />
 
                     <div className={pullRightClass}>
                         <button
                             className={buttonDefaultStylesClass}
-                            onClick={() => handleClick(index)}>
+                            onClick={() => props.removeProsCons(index, props.type)}>
                             -
                         </button>
                     </div>
@@ -43,16 +49,14 @@ const List = (props) => {
 
 List.propTypes = {
     list: PropTypes.array,
-    updateProsCons: PropTypes.func
+    removeProsCons: PropTypes.func,
+    updateProsCons: PropTypes.func,
+    type: PropTypes.string
 };
 
 const mapStateToProps = state => ({
-    prosCons: state.prosCons
+    prosCons: prosConsSelector(state)
 });
-
-// const mapDispatchToProps = dispatch => ({
-//     updateProsConsData: (groupId, userId) => dispatch(updateProsConsData(groupId, userId)),
-// });
 
 export const ListComponent = connect(
     mapStateToProps,

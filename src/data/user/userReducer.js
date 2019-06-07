@@ -10,7 +10,8 @@ export function user(state = initialState, action) {
         case GET_USER_DATA_SUCCESS:
             return {
                 ...state,
-                userData: action.payload
+                groupId: action.userData[0].groupId,
+                userId: action.userData[1].userId
             };
 
         case GET_USER_DATA_FAILURE:
