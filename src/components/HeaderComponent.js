@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {css} from "emotion";
 import {colors} from "../shared/colors";
 import {roundingIntervalsClass} from "../shared/StyleHelper";
-import {FooterComponent} from "./FooterComponent";
 
 const header = css`
     ${roundingIntervalsClass};
@@ -22,6 +21,6 @@ export const HeaderComponent = (props) => {
     )
 };
 
-FooterComponent.propTypes = {
+HeaderComponent.propTypes = {
     label: PropTypes.string
 };
