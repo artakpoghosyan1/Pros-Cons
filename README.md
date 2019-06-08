@@ -6,7 +6,7 @@ In the project directory, you can run:
 
 ### `npm start` or `yarn start`
 
-##### Make sure you have already installed all dependencies `npm i` or `yarn`
+##### Make sure you have already installed all dependencies by running `npm i` or `yarn`
 
 Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
